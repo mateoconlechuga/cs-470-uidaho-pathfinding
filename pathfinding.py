@@ -186,6 +186,7 @@ def main():
         try:
             search = Find('map.txt', types[j], types[j + 1])
             path, cost = search.get()
+            length = len(path) - 1
         except Exception:
             return print('error: no path found')
 
@@ -216,11 +217,11 @@ def main():
                         draw.rectangle(outline, None, 'green')
             draw.text((2, 0), type_str, (255, 255, 255))
             draw.text((2, 10), 'cost: ' + str(cost), (255, 255, 255))
-            draw.text((width - 67, 10), 'length: ' + str(len(path)), (255, 255, 255))
+            draw.text((width - 67, 10), 'length: ' + str(length), (255, 255, 255))
 
         print('wrote: ' + type_str + '.png')
         print('cost: ' + str(cost))
-        print('length: ' + str(len(path)))
+        print('length: ' + str(length))
         img.save(type_str + '.png')
 
 
