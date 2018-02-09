@@ -180,7 +180,7 @@ def main():
 
     for j in range(0, len(types), 2):
         type_str = types[j]
-        if types[j] == 'a_star' or types[j] == 'greedy':
+        if types[j + 1] is not 'none':
             type_str += '_' + types[j + 1]
 
         try:
