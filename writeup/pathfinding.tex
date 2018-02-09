@@ -176,7 +176,7 @@ Breadth-first examines almost every possible path until the goal is hit.
 This gives it a rather worrisome time and space complexity of $O(b^{d+1})$.
 Starting with an initial parent, it branches out to surrounding children recursively.
 It therefore will always find any existing solution, and the solution with the shortest possible path.
-From the reference implementation, costs, scores, and heuristics are not used in the breadth-first search. Parents are taken from the open list in a first come first out (FIFO) queue style.
+From the reference implementation, costs, scores, and heuristics are not used in the breadth-first search. Parents are taken from the open list in a first in first out (FIFO) queue style.
 This is shown above in Figure \ref{fig:breadth-first}.
 We note that it needs to explore nearly every cell, nearly 90\% of the example map.
 
@@ -201,7 +201,7 @@ We can see that it avoided the mountain range in the upper left corner, and did 
 \section{Conclusion}
 The above algorithms all have different desires in mind, and thus it is impossible to conclude that one is better than another.
 Based on the results though, A* should be used in most standard implementations as it provides a nice middle ground between time and space complexity.
-All in all, this project was rather fun and Python made it possible to implement all these different routines in ~200 lines which was a lot better than attempting to do this in a different language.
+All in all, this project was rather fun and Python made it possible to implement all these different routines in \textasciitilde200 lines which was a lot better than attempting to do this in a different language.
 
 \clearpage
 
