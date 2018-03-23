@@ -1,21 +1,9 @@
-## Algorithms
+# CS475/575 - Artificial Intelligence
 
- * Breadth first
- * Lowest cost
- * Greedy best first
- * A*
+Projects related to University of Idaho Artificial Intelligence Algorithms
 
-## Heuristics
- * Euclidean
- * Manhattan
+*Project 1*: Pathfinding
 
-## Map Design
+*Project 2*: Connect 4 AI
 
-|Character      |Meaning        |Movement Cost|
-|---------------|---------------|-------------|
-|R              |road           |1            |
-|f              |field          |2            |
-|F              |forest         |4            |
-|h              |hills          |5            |
-|r              |river          |7            |
-|M              |mountains      |10           |
+(c) Matt Waltz Spring 2018

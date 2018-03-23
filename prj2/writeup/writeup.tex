@@ -1,0 +1,479 @@
+\documentclass[11pt,letterpaper]{article}
+
+% font
+\usepackage{palatino}
+\usepackage[T1]{fontenc}
+\linespread{1.05}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+% packages
+\usepackage{graphicx}
+\usepackage{placeins}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage{lipsum}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{weborange}{RGB}{255,165,0}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    emphstyle={\color{blue}},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+    classoffset=1, % starting new class
+    otherkeywords={self,<,.,;,-,!,=,~},
+    morekeywords={self,<,.,;,-,!,=,~},
+    keywordstyle=\color{or},
+    classoffset=0,
+}
+\lstset{style=mystyle}
+
+\usepackage[backend=bibtex8]{biblatex}
+\usepackage[font=scriptsize,labelfont=bf]{caption}
+\usepackage[left=.7in,right=.7in,top=1in,bottom=1in,headheight=13.6pt]{geometry}
+\pagestyle{empty}
+
+% enviornment
+\graphicspath{{./figures/}}
+\pagestyle{fancy}
+\fancyhf[hl]{Project 2 - Connect 4}
+\fancyhf[hr]{9th March 2018}
+\author{Matthew Waltz}
+
+% begin
+\begin{document}
+
+\begin{center}
+   \textbf{CS 470: Project 2 - Connect 4} \\
+   \textbf{University of Idaho} \\
+   \textbf{Matthew Waltz} \\
+   \textbf{9th March 2018} \\
+\end{center}
+
+\begin{abstract}
+This project implements an alpha-beta pruned minmax algorithm to play connect 4 against a human opponent. Coded in the C language, it plays rather well and quickly and is able to find a winning move in most every case. It also makes sure to block any potential winning moves by the human player and takes the winning position before blocking if one exists. It also performs rudimentary shortest winning path finding by selecting the best route found during the alpha-beta search. One interesting result is that it favors diagonal wins, or that may just be my horrible ability to see what it is going to do in the future. All in all though, the algorithm works which was the best feeling.
+\end{abstract}
+
+\tableofcontents
+
+\clearpage
+\section{Algorithm}
+The following section describes various parts of the overall algorithm.
+
+\subsection{Min-Max}
+The core algorithm was designed around minmax which is implemented with alpha beta constraints.
+It works by maximizing for the AI, and then minimizing for the human player recursively. It simulates dropping a piece into the column and evaluates the position, and then undos that drop and repeats. The depth of the search is limited to a depth of 9 ahead in order to keep a reasonable space and time constraint. The children of each node then are produced by each successive simulated drop, which are then evaluated. Once the root node is reached, the evaluation function takes over.
+
+\subsection{Alpha-Beta}
+As an addition to the minmax algorithm, alpha beta pruning is used to help reduce the time.
+This is done by taking the return of the minmax and using it the next runs, narrowing the search field based on the maximum for the AI and the minimum for the human player.
+The INT\_MIN and INT\_MAX limits are used as positive and negative infinity in order to highly outweigh the respective search when beginning. It also uses them when it detects that beta is less than or equal to the alpha value.
+
+\subsection{Evaluation Function}
+The evaluation function is rather heavy but works by taking the surrounding pieces and and giving them weights, i.e. two pieces together would be multiplied by 10, three piece result by 100, and four piece result by 1000 in order to  help ensure it is always selected.
+It also uses the distances away from similar pieces in a row for example, having two on a line with a single space in between them would result in a combo of 3, which would then be applied the weight.
+Ultimately it works quite well it seems, although I'm curious as to how it may perform against other evaluation functions.
+
+\subsection{Selection / Shortest Win Path}
+The algorithm always selects the winning move and blocks the opponent's move, which is demonstrated in the following screen shots of game play. In addition, the board is also checked for any winning moves when running the alpha-beta pruning and if one is found for the AI it automatically takes the shortest winning path and delivers it to the algorithm.
+
+\section{Results}
+
+\begin{figure}[H]
+    \centering
+    \subfloat[]{{\includegraphics[]{block1.png} }}%
+    \qquad
+    \subfloat[]{{\includegraphics[]{block2.png} }}%
+    \qquad
+    \subfloat[]{{\includegraphics[]{block3.png} }}%
+    \caption{Results from various different game states, described in detail in the next section.}
+    \label{fig:breadth-first}
+\end{figure}
+
+\subsection{Game Play}
+As shown in the above Figure \ref{fig:breadth-first}, the game state on the left (a) shows the program choosing the winning move in addition to blocking the human from winning at the same time, not bothering to even look at the 3 piece combo on row 4. In the second screenshot (b) the AI blocks the user from winning as soon as it detected a 3 in a row combo. The last screenshot (c) shows the AI favoring a win over blocking the user, because that is a faster method to finding the correct solution. Rather than blocking on row 6, it takes row 5 and wins the game. It's so smart it's almost scary.
+
+\section{Conclusion}
+The program appears to play extremely well when there are diagonal wins, and seems to favor winning diagonally which I found rather interesting.
+A strength of the program is that it evaluates fairly quickly and is able to pull a reasonable decision from the tree. One weakness is that it is rather weak when playing against a solved connect 4 AI, so in the future I would like to be able to add move ordering and perhaps a table to store previous moves as a hash so it doesn't need to continuously route through the same nodes every time. All in all though I feel pretty happy with how it plays and I am interested to see how it would compare with others.
+
+\newgeometry{left=.6in,right=.6in,top=1in,bottom=.6in}
+\section{Code Appendix}
+\begin{lstlisting}[language=Python]
+// matt waltz
+// connect 4 ai algorithm
+// cs470 spring 2018
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <limits.h>
+
+#define WIDTH 7
+#define HEIGHT 6
+#define MAX_DEPTH 9
+#define max(x, y) (((x) > (y)) ? (x) : (y))
+#define min(x, y) (((x) < (y)) ? (x) : (y))
+
+static uint8_t board[HEIGHT][WIDTH];
+static int move_next;
+
+enum {
+    NONE=-1, EMPTY, AI, HUMAN, CHECK, COMBO=4
+};
+
+static char *win_str[] = {
+    "Draw Game\n", "AI Won\n", "You Won\n",
+};
+
+bool legal(int col) {
+    return col < WIDTH && col >= 0 && !board[0][col];
+}
+
+void move_col(int col, int player) {
+    for (int i=HEIGHT-1; i>=0; i--) {
+        if (board[i][col] == EMPTY) {
+            board[i][col] = player;
+            break;
+        }
+    }
+}
+
+void move_undo(int col) {
+    for (int i=0; i<HEIGHT; i++) {
+        if (board[i][col]) {
+            board[i][col] = EMPTY;
+            break;
+        }
+    }
+}
+
+void show_board(void) {
+    printf("\n");
+    for (int i=0; i<HEIGHT; i++) {
+        for (int j=0; j<WIDTH; j++) {
+            printf("%c ", board[i][j] == AI ? 'A' : board[i][j] == HUMAN ? 'H' : 'O');
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+int calc_score(int m, int distance) {
+    int score = COMBO - distance;
+    switch (m) {
+        case 0: return 0;
+        case 1: return 1 * score;
+        case 2: return 10 * score;
+        case 3: return 100 * score;
+        default: return 1000;
+    }
+}
+
+int check_board(void) {
+    int k, ai = 0, human = 0;
+    for (int i=HEIGHT-1; i>=0; i--) {
+        for (int j=0; j<WIDTH; j++) {
+            if (j <= CHECK) {
+                for (k=0; k<COMBO; k++) {
+                        if (board[i][j+k] == AI) ai++;
+                        else if (board[i][j+k] == HUMAN) human++;
+                        else break;
+                }
+                if (ai == COMBO || human == COMBO) {
+                    return ai == COMBO ? AI : HUMAN;
+                }
+                ai = human = 0;
+            }
+            if (i >= CHECK) {
+                for (k=0; k<COMBO; k++) {
+                        if (board[i-k][j] == AI) ai++;
+                        else if (board[i-k][j] == HUMAN) human++;
+                        else break;
+                }
+                if (ai == COMBO || human == COMBO) {
+                    return ai == COMBO ? AI : HUMAN;
+                }
+                ai = human = 0;
+            }
+            if (j <= CHECK && i >= CHECK) {
+                for (k=0; k<COMBO; k++) {
+                    if (board[i-k][j+k] == AI) ai++;
+                    else if (board[i-k][j+k] == HUMAN) human++;
+                    else break;
+                }
+                if (ai == COMBO || human == COMBO) {
+                    return ai == COMBO ? AI : HUMAN;
+                }
+                ai = human = 0;
+            }
+            if (j >= CHECK && i >= CHECK) {
+                for (k=0; k<COMBO; k++) {
+                    if (board[i-k][j-k] == AI) ai++;
+                    else if (board[i-k][j-k] == HUMAN) human++;
+                    else break;
+                }
+                if (ai == COMBO || human == COMBO) {
+                    return ai == COMBO ? AI : HUMAN;
+                }
+                ai = human = 0;
+            }
+        }
+    }
+
+    for (int j=0; j<WIDTH; j++) {
+        if (!board[0][j]) return NONE;
+    }
+
+    return EMPTY;
+}
+
+int hueristic(void) {
+    int ai = 1, score = 0, empty = 0;
+    int i, c, r, j, k = 0, distance = 0;
+    for (i=HEIGHT-1; i>=0; i--) {
+        for (j=0; j<WIDTH; j++) {
+            if (board[i][j] == EMPTY || board[i][j] == HUMAN) continue;
+            if (j <= CHECK) {
+                for (k=0; k<COMBO; k++) {
+                    if (board[i][j+k] == AI) ai++;
+                    else if (board[i][j+k] == HUMAN) {
+                        ai = empty = 0; break;
+                    } else empty++;
+                }
+                distance = 0;
+                if (empty) {
+                    for (c=0; c<COMBO; c++) {
+                        for (r=i; r<HEIGHT; r++) {
+                            if (board[r][j+c] == EMPTY) distance++;
+                            else break;
+                        }
+                    }
+                }
+                if (distance) {
+                    score += calc_score(ai, distance);
+                }
+                ai = 1;
+                empty = 0;
+            }
+            if (i >= CHECK) {
+                for (k=0; k<COMBO; k++) {
+                    if (board[i-k][j] == AI) ai++;
+                    else if (board[i-k][j] == HUMAN) {
+                        ai = 0; break;
+                    }
+                }
+                distance = 0;
+                if (ai) {
+                    for (r=i-k+1; r<=i-1; r++) {
+                        if (board[r][j] == EMPTY) distance++;
+                        else break;
+                    }
+                }
+                if (distance) {
+                    score += calc_score(ai, distance);
+                }
+                ai = 1;
+                empty = 0;
+            }
+            if (j >= CHECK) {
+                for (k=0; k<COMBO; k++) {
+                    if (board[i][j-k] == AI)ai++;
+                    else if (board[i][j-k] == HUMAN) {
+                        ai = empty = 0; break;
+                    } else empty++;
+                }
+                distance = 0;
+                if (empty)
+                    for (c=0; c<COMBO; c++) {
+                        for (r=i; r<HEIGHT; r++) {
+                            if (board[r][j-c] == EMPTY) distance++;
+                            else break;
+                        }
+                    }
+
+                if (distance) {
+                    score += calc_score(ai, distance);
+                }
+                ai = 1;
+                empty = 0;
+            }
+            if (j <= CHECK && i >= CHECK) {
+                for (k=0; k<COMBO; k++) {
+                    if (board[i-k][j+k] == AI) ai++;
+                    else if (board[i-k][j+k] == HUMAN) {
+                        ai = empty = 0; break;
+                    } else empty++;
+                }
+                distance = 0;
+                if (empty) {
+                    for (c=0; c<COMBO; c++) {
+                        for (r=i-c; r<HEIGHT; r++) {
+                            if (board[r][j+c] == EMPTY) distance++;
+                            if (board[r][j+c] == HUMAN) break;
+                        }
+                    }
+                    if (distance) {
+                        score += calc_score(ai, distance);
+                    }
+                    ai = 1;
+                    empty = 0;
+                }
+            }
+
+            if (i >= CHECK && j >= CHECK) {
+                for (k=0; k<COMBO; k++) {
+                    if (board[i-k][j-k] == AI) ai++;
+                    else if (board[i-k][j-k] == HUMAN) {
+                        ai = empty = 0; break;
+                    } else empty++;
+                }
+                distance = 0;
+                if (empty) {
+                    for (c=0; c<COMBO; c++) {
+                        for (r=i-c; r<HEIGHT; r++) {
+                            if (board[r][j-c] == EMPTY) distance++;
+                            if (board[r][j-c] == HUMAN) break;
+                        }
+                    }
+                    if (distance) {
+                        score += calc_score(ai, distance);
+                    }
+                    ai = 1;
+                    empty = 0;
+                }
+            }
+        }
+    }
+    return score;
+}
+
+int minmax(int depth, int player, int alpha, int beta) {
+    int max = INT_MIN;
+    int min = INT_MAX;
+
+    if (beta <= alpha) {
+        return player == AI ? INT_MAX : INT_MIN;
+    }
+
+    switch (check_board()) {
+        case AI: return INT_MAX - 1;
+        case HUMAN: return INT_MIN + 1;
+        case EMPTY: return 0;
+        default: break;
+    }
+
+    if (depth == MAX_DEPTH) {
+        return hueristic();
+    }
+
+    for (int j=0; j<WIDTH; j++) {
+        if (!legal(j)) continue;
+        int score = 0;
+        switch (player) {
+            default:
+            case AI:
+                move_col(j, player);
+                score = minmax(depth + 1, HUMAN, alpha, beta);
+                if (!depth) {
+                    if (score > max) move_next = j;
+                    if (score == INT_MAX - 1) {
+                        move_undo(j);
+                        return score;
+                    }
+                }
+                max = max(score, max);
+                alpha = max(score, alpha);
+                break;
+            case HUMAN:
+                move_col(j, player);
+                score = minmax(depth + 1, AI, alpha, beta);
+                min = min(score, min);
+                beta = min(score, beta);
+                break;
+        }
+        move_undo(j);
+        if (score == INT_MAX || score == INT_MIN) break;
+    }
+    return player == AI ? max: min;
+}
+
+int move_ai(void) {
+    minmax(0, AI, INT_MIN, INT_MAX);
+    return move_next;
+}
+
+void move_human(void) {
+    int move, res;
+    printf("move [1-7]: ");
+    res = scanf("%d", &move);
+    while (res != 1 || !legal(move - 1)) {
+        printf("invalid.\n\nmove [1-7]: ");
+        res = scanf("%d", &move);
+    }
+    move_col(move - 1, HUMAN);
+}
+
+int main(void) {
+    int res;
+    char input[20];
+    printf("play first? [y/n]: ");
+    fgets(input, 20, stdin);
+
+    if (input[0] == 'y') {
+        move_human();
+    }
+
+    show_board();
+    int ai_move = move_ai();
+    move_col(3, AI);
+    show_board();
+
+    for (;;) {
+        move_human();
+        show_board();
+        if ((res = check_board()) != NONE) {
+            printf("%s", win_str[res]);
+            break;
+        }
+
+        int ai_move = move_ai();
+        printf("ai move: %d\n", ai_move + 1);
+
+        move_col(ai_move, AI);
+        show_board();
+        if ((res = check_board()) != NONE) {
+            printf("%s", win_str[res]);
+            break;
+        }
+    }
+
+    return 0;
+}
+\end{lstlisting}
+\end{document}
