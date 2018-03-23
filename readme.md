@@ -1,4 +1,4 @@
-# CS475/575 - Artificial Intelligence
+# CS470/570 - Artificial Intelligence
 
 Projects related to University of Idaho Artificial Intelligence Algorithms
 
